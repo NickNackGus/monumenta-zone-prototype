@@ -90,7 +90,7 @@ tests["test_warn_eclipsed"] = ZoneManager([
 ], axis_order=[1, 0])
 
 
-test = tests["region_2"]
+test = tests["test_3d_mid"]
 
 zones_start = len(test)
 
