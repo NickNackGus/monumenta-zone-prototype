@@ -8,7 +8,7 @@ class Zone(object):
 
     pos2 is being rewritten to be exclusive, not inclusive.
     """
-    def __init__(self, other=None, name=None, ztype=None, equipment_damage=None, pos=None, size=None, parents=[], axis_order=None, original_id=None):
+    def __init__(self, other=None, name=None, ztype=None, equipment_damage=None, pos=None, size=None, axis_order=None, original_id=None):
         self.original_id = None
 
         if isinstance(other, type(self)):
@@ -19,7 +19,7 @@ class Zone(object):
             self._init_from_config(other, axis_order, original_id)
 
         elif other is None:
-            self._init_from_values(name, ztype, equipment_damage, pos, size, parents, axis_order, original_id)
+            self._init_from_values(name, ztype, equipment_damage, pos, size, axis_order, original_id)
 
         else:
             raise TypeError("Expected Zone to be initialized with a dict or another Zone")
@@ -27,17 +27,12 @@ class Zone(object):
         if self.original_id is None:
             self.original_id = original_id
 
-        self.children = []
-        for parent in self.parents:
-            parent.children.append(self)
-
     def _init_from_zone(self, other):
         self.name = other.name
         self.type = other.type
         self.equipment_damage = other.equipment_damage
         self._pos = deepcopy(other._pos)
         self._size = deepcopy(other._size)
-        self.parents = [other]
         self.axis_order = deepcopy(other.axis_order)
         self.original_id = other.original_id
 
@@ -52,8 +47,6 @@ class Zone(object):
         self._pos = a.min_corner(b)
         self._size = a.max_corner(b) + Pos([1]*len(self._pos)) - self._pos
 
-        self.parents = []
-
         # Order to process axes, such as [0, 2, 1]
         if axis_order is None:
             axis_order = list(range(len(self._pos)))
@@ -61,13 +54,12 @@ class Zone(object):
 
         self.original_id = original_id
 
-    def _init_from_values(self, name, ztype, equipment_damage, pos, size, parents, axis_order, original_id):
+    def _init_from_values(self, name, ztype, equipment_damage, pos, size, axis_order, original_id):
         self.name = name
         self.type = ztype
         self.equipment_damage = equipment_damage
         self._pos = Pos(pos)
         self._size = Pos(size)
-        self.parents = parents
 
         # Order to process axes, such as [0, 2, 1]
         if axis_order is None:
@@ -159,8 +151,7 @@ class Zone(object):
             name="{} X {}".format(self.name, other.name),
             ztype=self.type,
             pos=result_min,
-            size=result_size,
-            parents=[self, other]
+            size=result_size
         )
 
     def split_by_overlap(self, overlap):
@@ -169,7 +160,6 @@ class Zone(object):
             raise TypeError("Expected overlap to be type Zone.")
 
         work = Zone(self)
-        work.parents.append(overlap)
 
         other_min = overlap.min_corner
         other_max = overlap.max_corner + Pos([1]*len(other_min))
@@ -181,12 +171,10 @@ class Zone(object):
                 continue
 
             lower, work = work.split_axis(other_min, axis)
-            work.parents = work.parents[0]
             if lower:
                 result.append(lower)
 
             work, upper = work.split_axis(other_max, axis)
-            work.parents = work.parents[0]
             if upper:
                 result.append(upper)
 
@@ -214,18 +202,22 @@ class Zone(object):
         if self: # None-zero size
             if self.equipment_damage is None:
                 return (
-                    'Zone({'
+                    'Zone('
+                    + 'original_id={!r}'.format(self.original_id)
+                    + ', {'
                     + '"name": {!r}, "type": {!r}, "pos1": {!r}, "pos2": {!r}'.format(self.name, self.type, self.pos1.list, self.pos2.list)
                     + '}'
-                    + ', axis_order={!r}, original_id={!r})'.format(self.axis_order, self.original_id)
+                    + ', axis_order={!r})'.format(self.axis_order)
                 )
 
             else:
                 return (
-                    'Zone({'
+                    'Zone('
+                    + 'original_id={!r}'.format(self.original_id)
+                    + ', {'
                     + '"name": {!r}, "type": {!r}, "equipment_damage": {!r}, "pos1": {!r}, "pos2": {!r}'.format(self.name, self.type, self.equipment_damage, self.pos1.list, self.pos2.list)
                     + '}'
-                    + ', axis_order={!r}, original_id={!r})'.format(self.axis_order, self.original_id)
+                    + ', axis_order={!r})'.format(self.axis_order)
                 )
 
         else:

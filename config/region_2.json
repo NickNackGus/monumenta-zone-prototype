@@ -1,10 +1,25 @@
 {
+  "dailyResetEnabled": true,
+  "joinMessagesEnabled": false,
+  "transferDataEnabled": true,
+  "isTownWorld": false,
+  "broadcastCommandEnabled": true,
+  "plotSurvivalMinHeight": 256,
+  "allowedTransferTargets": [],
+  "isSleepingEnabled": true,
+  "keepLowTierInventory": true,
+  "classSpecializationsEnabled": true,
+  "forbiddenItemLore": [],
   "locationBounds": [
-    {"name":"Misport 1", "type":"Capital", "pos1":"-924 256 1218", "pos2":"-633 0 1428"},
-    {"name":"Misport 2", "type":"Capital", "pos1":"-831 256 1429", "pos2":"-633 0 1515"},
-    {"name":"Misport 3", "type":"Capital", "pos1":"-872 256 1429", "pos2":"-832 0 1484"},
-    {"name":"Misport 4", "type":"Capital", "pos1":"-912 256 1429", "pos2":"-872 0 1470"},
-    {"name":"Misport 5", "type":"Capital", "pos1":"-634 256 1429", "pos2":"-923 0 1427"},
+    {"name":"RaidingPartyBar", "type":"AdventureZone", "pos1":"-810 53 1350", "pos2":"-837 13 1376"},
+    {"name":"Lime Puzzle 1", "type":"Capital", "pos1":"-939 9 1352", "pos2":"-874 45 1441"},
+    {"name":"Lime Puzzle 2", "type":"Capital", "pos1":"-842 10 1391", "pos2":"-877 31 1356"},
+
+    {"name":"Mistport 1", "type":"Capital", "pos1":"-924 256 1218", "pos2":"-633 0 1428"},
+    {"name":"Mistport 2", "type":"Capital", "pos1":"-831 256 1429", "pos2":"-633 0 1515"},
+    {"name":"Mistport 3", "type":"Capital", "pos1":"-872 256 1429", "pos2":"-832 0 1484"},
+    {"name":"Mistport 4", "type":"Capital", "pos1":"-912 256 1429", "pos2":"-872 0 1470"},
+    {"name":"Mistport 5", "type":"Capital", "pos1":"-634 256 1429", "pos2":"-923 0 1427"},
     {"name":"Carnival Island", "type":"Capital", "pos1":"-423 256 1509", "pos2":"-501 0 1565"},
     {"name":"Carnival Ships", "type":"Capital", "pos1":"-521 256 1566", "pos2":"-417 0 1620"},
     {"name":"TheGardens", "type":"Capital", "pos1":"-1002 256 1429", "pos2":"-947 0 1373"},
@@ -16,8 +31,8 @@
     {"name":"Alnera 5", "type":"Capital", "pos1":"441 0 869", "pos2":"504 256 928"},
     {"name":"Alnera 6", "type":"Capital", "pos1":"412 0 869", "pos2":"460 256 906"},
     {"name":"Rahkeri 1", "type":"SafeZone", "pos1":"-99 142 407", "pos2":"-206 133 494"},
-    {"name":"Rahkeri 2", "type":"SafeZone", "pos1":"-220 142 390", "pos2":"-91 256 503"},
     {"name":"Rahkeri Bunker", "type":"AdventureZone", "pos1":"-123 147 460", "pos2":"-149 162 436"},
+    {"name":"Rahkeri 2", "type":"SafeZone", "pos1":"-220 142 390", "pos2":"-91 256 503"},
     {"name":"Molta 1", "type":"SafeZone", "pos1":"116 0 45", "pos2":"134 125 81"},
     {"name":"Molta 2", "type":"SafeZone", "pos1":"133 0 24", "pos2":"242 256 191"},
     {"name":"Molta 3", "type":"SafeZone", "pos1":"168 0 -19", "pos2":"243 256 25"},
@@ -33,7 +48,6 @@
     {"name":"Nightroost 3", "type":"SafeZone", "pos1":"-1334 256 475", "pos2":"-1363 116 527"},
     {"name":"Wispervale 1", "type":"SafeZone", "pos1":"-1805 256 56", "pos2":"-1718 0 -18"},
     {"name":"Wispervale 2", "type":"SafeZone", "pos1":"-1678 256 -136", "pos2":"-1856 0 -18"},
-    {"name":"Wispervale 3", "type":"SafeZone", "pos1":"-1805 127 -10", "pos2":"-1677 198 -24"},
 
     {"name":"SunkenTemplePuzzleMain", "type":"AdventureZone", "pos1":"-448 47 245", "pos2":"-495 0 158"},
     {"name":"SunkenTemplePuzzleOne", "type":"AdventureZone", "pos1":"-570 99 1331", "pos2":"-544 129 1363"},
@@ -51,7 +65,6 @@
     {"name":"RaidingPartyLevyn", "type":"AdventureZone", "pos1":"-1697 69 856", "pos2":"-1722 55 813"},
     {"name":"RaidingPartyIzzy", "type":"AdventureZone", "pos1":"41 20 984", "pos2":"60 5 961"},
     {"name":"RaidingPartySamwell", "type":"AdventureZone", "pos1":"103 23 975", "pos2":"86 39 955"},
-    {"name":"RaidingPartyBar", "type":"AdventureZone", "pos1":"-810 53 1350", "pos2":"-837 13 1376"},
     {"name":"GuardianSpec", "type":"AdventureZone", "pos1":"-1791 130 350", "pos2":"-1770 155 373"},
     {"name":"GuardianSpecFight", "type":"AdventureZone", "pos1":"-1780 25 315", "pos2":"-1761 43 345"},
     {"name":"ReaperSpec", "type":"AdventureZone", "pos1":"-879 87 1764", "pos2":"-852 120 1792"},
@@ -65,6 +78,12 @@
     {"name":"FallShrine", "type":"AdventureZone", "pos1":"-1802 0 999", "pos2":"-1742 22 1047"},
     {"name":"WinterShrine", "type":"AdventureZone", "pos1":"-1361 0 306", "pos2":"-1313 27 368"},
 
+    {"name":"LightGrayPuzzle", "type":"AdventureZone", "pos1":"-1147 0 -53", "pos2":"-1228 52 -119"},
+    {"name":"LightGrayBackend", "type":"AdventureZone", "pos1":"-1225 0 -53", "pos2":"-1285 52 -119"},
+    {"name":"LightGrayTreasure", "type":"AdventureZone", "pos1":"-1159 0 -67", "pos2":"-1119 24 -103"},
+    {"name":"LightGrayStatue", "type":"AdventureZone", "pos1":"-1294 160 -104", "pos2":"-1228 70 -46"},
+    {"name":"LightGrayCutscene", "type":"AdventureZone", "pos1":"-1630 70 -46", "pos2":"-1679 104 -2"},
+
     {"name":"LimeLobby", "type":"SafeZone", "pos1":"-939 0 904", "pos2":"-880 46 986"},
     {"name":"PinkLobby", "type":"SafeZone", "pos1":"-1017 0 589", "pos2":"-958 46 671"},
     {"name":"GrayLobby", "type":"SafeZone", "pos1":"210 0 332", "pos2":"268 46 414"},
@@ -74,8 +93,6 @@
     {"name":"Steelmeld 1", "type":"SafeZone", "pos1":"-653 1 -435", "pos2":"-497 52 -570"},
     {"name":"Steelmeld 2", "type":"SafeZone", "pos1":"-498 1 -445", "pos2":"-402 68 -495"},
     {"name":"NightroostReserve", "type":"AdventureZone", "pos1":"-1302 40 502", "pos2":"-1240 72 459"},
-    {"name":"Lime Puzzle 1", "type":"Capital", "pos1":"-939 9 1352", "pos2":"-874 45 1441"},
-    {"name":"Lime Puzzle 2", "type":"Capital", "pos1":"-842 10 1391", "pos2":"-877 31 1356"},
     {"name":"Elementist Puzzle", "type":"AdventureZone", "pos1":"-1515 39 -1675", "pos2":"-1584 99 -1743"},
     {"name":"Tenebrist Puzzle", "type":"AdventureZone", "pos1":"-1595 43 -1752", "pos2":"-1676 69 -1677"},
     {"name":"Harbinger Arena", "type":"AdventureZone", "pos1":"-1575 25 -1369", "pos2":"-1650 86 -1300"},
@@ -95,6 +112,11 @@
     {"name":"Captain Reils", "type":"AdventureZone", "pos1":"-640 1 1587", "pos2":"-618 20 1613"},
     {"name":"The Ishnir Trade Hall", "type":"SafeZone", "pos1":"154 54 384", "pos2":"211 2 328"},
     {"name":"The Ishnir Trade Hall Entrance", "type":"AdventureZone", "pos1":"185 109 436", "pos2":"117 120 445"},
-    {"name":"Xeno Underwater", "type":"AdventureZone", "pos1":"-1315 0 1749", "pos2":"-1179 48 1646"}   
-  ]
+    {"name":"Xeno Underwater", "type":"AdventureZone", "pos1":"-1315 0 1749", "pos2":"-1179 48 1646"},
+    {"name":"Viridian Temple", "type":"AdventureZone", "pos1":"-1427 0 -1119", "pos2":"-1460 53 -1202"}
+   
+
+
+  ],
+  "unbreakableBlocks": []
 }

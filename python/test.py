@@ -133,5 +133,15 @@ tree = test.get_tree()
 tree.show_tree()
 
 print("-"*120)
-print("Max depth: {}".format(tree.max_depth()))
+print("Max depth:  {}".format(tree.max_depth()))
+print("Leaf nodes: {}".format(len(tree)))
+
+print("="*120)
+print("Optimizing...")
+
+tree.optimize()
+
+print("-"*120)
+print("Max depth:  {}".format(tree.max_depth()))
+print("Leaf nodes: {}".format(len(tree)))
 

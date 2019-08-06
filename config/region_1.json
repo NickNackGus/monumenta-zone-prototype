@@ -1,6 +1,17 @@
 {
+  "dailyResetEnabled": true,
+  "joinMessagesEnabled": false,
+  "transferDataEnabled": true,
+  "isTownWorld": false,
+  "broadcastCommandEnabled": true,
+  "plotSurvivalMinHeight": 95,
+  "allowedTransferTargets": [],
+  "forbiddenItemLore": ["§8Celsian Isles :", "Celsian Isles :"],
+  "isSleepingEnabled": true,
+  "keepLowTierInventory": true,
   "locationBounds": [
     {"name":"Arena", "type":"AdventureZone", "pos1":"-966 90 -124", "pos2":"-926 256 -84"},
+    {"name":"Old Labs Lobby", "type":"SafeZone", "pos1":"-764 6 -23", "pos2":"-722 37 43"},
     {"name":"Sierhaven Ports", "type":"AdventureZone", "pos1":"-1065 0 -21", "pos2":"-922 50 84"},
     {"name":"KingsRoom", "type":"AdventureZone", "pos1":"-717 44 -119", "pos2":"-651 88 -65"},
     {"name":"Capital", "type":"Capital", "pos1":"-1130 0 -284", "pos2":"-498 256 344"},
@@ -16,7 +27,6 @@
     {"name":"Lowtide docks", "type":"SafeZone", "pos1":"664 0 474", "pos2":"675 255 483"},
     {"name":"Lowtide boat", "type":"SafeZone", "pos1":"650 0 483", "pos2":"675 255 558"},
 
-    {"name":"Old Labs Lobby", "type":"SafeZone", "pos1":"-764 6 -23", "pos2":"-722 37 43"},
     {"name":"White Wool Lobby", "type":"SafeZone", "pos1":"136 53 -186", "pos2":"176 83 -120"},
     {"name":"Orange Wool Lobby", "type":"SafeZone", "pos1":"27 64 164", "pos2":"67 94 229"},
     {"name":"Magenta Wool Lobby", "type":"SafeZone", "pos1":"453 12 5", "pos2":"493 42 70"},
@@ -47,6 +57,7 @@
     {"name":"Cursed Forest Patreon Trader", "type":"AdventureZone", "pos1":"1163 100 87", "pos2":"1151 90 80"},
     {"name":"Nivalis Cave", "type":"AdventureZone", "pos1":"998 119 -320", "pos2":"1008 135 -295"},
     {"name":"Haunted House Quest", "type":"AdventureZone", "pos1":"1000 7 72", "pos2":"1042 38 108"},
+    {"name":"Haunted House Quest Entrance", "type":"AdventureZone", "pos1":"1016 114 101", "pos2":"1028 106 111"},
     {"name":"Lost In My Mind - Bunker", "type":"AdventureZone", "pos1":"572 93 243", "pos2":"582 111 262"},
     {"name":"Crew To Remember", "type":"AdventureZone", "pos1":"-1443 130 21", "pos2":"-1530 82 -90"},
     {"name":"Crew To Remember Smuggler Drop", "type":"AdventureZone", "pos1":"-60 60 -4", "pos2":"-48 46 8"},
@@ -75,6 +86,7 @@
     {"name":"Starrier Night - Fishing Huts Bunker", "type":"AdventureZone", "pos1":"-408 43 -15", "pos2":"-384 28 9"},
     {"name":"Starrier Night - Fishing Hut Bunker Entrance", "type":"AdventureZone", "pos1":"-401 80 -8", "pos2":"-391 90 4"},
 
+    {"name":"Crimson Memory", "equipmentDamage":false, "type":"SafeZone", "pos1":"798 10 -237", "pos2":"788 19 -226"},
     {"name":"Nelfine 2 - New Lab", "type":"AdventureZone", "pos1":"813 54 -243", "pos2":"767 8 -135"},
     {"name":"Nelfine 2 - Destroyed Lab", "type":"AdventureZone", "pos1":"323 63 426", "pos2":"393 115 499"},
     {"name":"Nelfine 2 - Arian Office Replica", "type":"AdventureZone", "pos1":"1248 156 -120", "pos2":"1266 132 -98"},
@@ -107,7 +119,7 @@
     {"name":"Farr race", "type":"AdventureZone", "pos1":"1036 99 -119", "pos2":"1051 112 -105"},
     {"name":"Opal Mine", "type":"SafeZone", "pos1":"-865 255 768", "pos2":"-759 1 623"},
     {"name":"Pig Arena", "equipmentDamage":false, "type":"SafeZone", "pos1":"-160 0 -300", "pos2":"-113 24 -244"},
-    {"name":"Crimson Memory", "equipmentDamage":false, "type":"SafeZone", "pos1":"798 10 -237", "pos2":"788 19 -226"},
     {"name":"CluckRaceStart", "type":"AdventureZone", "pos1":"402 256 116", "pos2":"427 247 90"}
-  ]
+  ],
+  "unbreakableBlocks": []
 }
