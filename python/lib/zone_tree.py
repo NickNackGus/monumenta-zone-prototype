@@ -63,7 +63,9 @@ class ZoneTree(Zone):
         best_split = worst_case
         if debug:
             print("="*120)
-            print("Finding best split...")
+            print("Finding best split for:")
+            for zone in zones:
+                print("- {!r}".format(zone))
             print("Worst case:")
             print(worst_case)
             print("-"*120)
@@ -93,7 +95,8 @@ class ZoneTree(Zone):
                     print("  - New best!")
 
         if worst_case[0] == best_split[0]:
-            self.get_best_split(zones, debug=True)
+            if not debug:
+                self.get_best_split(zones, debug=True)
         else:
             return best_split[1], best_split[2]
 
