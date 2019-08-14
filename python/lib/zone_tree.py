@@ -10,7 +10,11 @@ from lib.zone import Zone
 class ZoneTree(Zone):
     """A tree of zones for fast search."""
     def __init__(self, zones=[]):
-        """A node of the zone tree. Zones must not overlap to load."""
+        """Create a zone tree. Zones must not overlap to load."""
+        self._init(zones)
+
+    def _init(self, zones):
+        """Load a list of zones. Reused by the rebalance method."""
         # True if this is an empty tree
         self.is_empty = False
         if len(zones) == 0:
@@ -44,7 +48,57 @@ class ZoneTree(Zone):
         self._less = ZoneTree(less) # Includes overlapping areas
         self._more = ZoneTree(more)
 
-        return
+    def rebalance(self):
+        """Rebalance the nodes of the tree."""
+        zones = list(self)
+        self.uninit()
+        self._init(zones)
+
+    def uninit(self):
+        """Uninitialize this node, deleting child nodes in the process."""
+        if self.is_empty:
+            self.is_empty = False
+
+        elif self.is_parent_node:
+            self._less.uninit()
+            self._more.uninit()
+
+            del self._less
+            del self._more
+
+            self.is_parent_node = False
+
+        else: # Leaf node
+            del self.here
+
+    def get_zone(self, pos):
+        """Get the zone a position is in."""
+        comparisons = 0
+        if self.is_empty:
+            comparisons += 1
+            return {"comparisons": 1, "zone": None}
+
+        elif self.is_parent_node:
+            comparisons += 1 + 1
+            if pos[self._axis] >= self._pivot:
+                comparisons += 1
+                result = self._more.get_zone(pos)
+                result["comparisons"] += comparisons
+                return result
+            else:
+                comparisons += 1
+                result = self._less.get_zone(pos)
+                result["comparisons"] += comparisons
+                return result
+
+        else: # Leaf node
+            comparisons += 1 + 1
+            if self.here.within(pos):
+                comparisons += 2*len(pos)
+                return {"comparisons": comparisons, "zone": self.here}
+            else:
+                comparisons += 2*len(pos)
+                return {"comparisons": comparisons, "zone": None}
 
     def get_best_split(self, zones, debug=False):
         """Determine which way to split the undivided zones.
@@ -100,6 +154,19 @@ class ZoneTree(Zone):
         else:
             return best_split[1], best_split[2]
 
+    def __iter__(self):
+        if self.is_empty:
+            raise StopIteration
+
+        elif self.is_parent_node:
+            for zone in self._less:
+                yield zone
+            for zone in self._more:
+                yield zone
+
+        else: # Leaf node
+            yield self.here
+
     def __len__(self):
         if self.is_empty:
             return 0
@@ -109,23 +176,6 @@ class ZoneTree(Zone):
 
         else: # Leaf node
             return 1
-
-    def get_zone(self, pos):
-        """Get the zone a position is in."""
-        if self.is_empty:
-            return None
-
-        elif self.is_parent_node:
-            if pos[self._axis] >= self._pivot:
-                return self._more.get_zone(pos)
-            else:
-                return self._less.get_zone(pos)
-
-        else: # Leaf node
-            if self.here.within(pos):
-                return self.here
-            else:
-                return None
 
     def max_depth(self):
         if self.is_empty:
@@ -141,31 +191,48 @@ class ZoneTree(Zone):
             return 1
 
     def optimize(self):
+        """Merge nodes where possible.
+
+        This will be replaced by the optimize method in zone_manager if it's better.
+        Returns the number of merges that occured.
+        """
+        merged = 0
         if self.is_empty or not self.is_parent_node:
-            return
+            return merged
 
         if self._less.is_parent_node:
-            self._less.optimize()
+            merged += self._less.optimize()
         if self._more.is_parent_node:
-            self._more.optimize()
+            merged += self._more.optimize()
 
         if self._less.is_parent_node or self._more.is_parent_node:
-            return
+            return merged
 
-        if self._less.here.original_id == self._more.here.original_id:
-            # Create a merged zone
-            self.here = Zone(self._less.here)
-            self.here.min_corner = self._less.here.min_corner
-            self.here.max_corner = self._less.here.max_corner
+        # Both child nodes are leaf nodes.
+        less = self._less.here
+        more = self._more.here
 
-            # Mark self as a leaf node, not a parent node
-            self.is_parent_node = False
+        if less.original_id != more.original_id:
+            return merged
 
-            # Delete unneeded attributes
-            delattr(self, "_axis")
-            delattr(self, "_pivot")
-            delattr(self, "_less")
-            delattr(self, "_more")
+        merged_zone = less.merge(more)
+        if merged_zone is None:
+            return merged
+        self.here = merged_zone
+
+        # Mark self as a leaf node, not a parent node
+        self.is_parent_node = False
+
+        # Delete unneeded attributes
+        del self._axis
+        del self._pivot
+        del self._less
+        del self._more
+
+        # This is merged, increment count
+        merged += 1
+
+        return merged
 
     def show_tree(self, header="─", prefix=""):
         """Print the tree structure to stdout for debugging."""

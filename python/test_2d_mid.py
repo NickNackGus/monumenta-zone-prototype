@@ -4,45 +4,11 @@
 import readline
 import code
 
-import json
 from lib.pos import Pos
 from lib.zone import Zone
 from lib.zone_manager import ZoneManager
 
-tests = {}
-
-
-with open("../config/region_1.json", "r") as fp:
-    region_1_prop = json.load(fp)
-    fp.close()
-
-tests["region_1"] = ZoneManager(region_1_prop["locationBounds"])
-
-
-with open("../config/region_2.json", "r") as fp:
-    region_2_prop = json.load(fp)
-    fp.close()
-
-tests["region_2"] = ZoneManager(region_2_prop["locationBounds"])
-
-
-tests["test_3d_mid"] = ZoneManager([
-    {
-        "name": "Alice",
-        "type": "Eggs",
-        "pos1": [2, 2, 2],
-        "pos2": [4, 4, 4],
-    },
-    {
-        "name": "Bob",
-        "type": "Spam",
-        "pos1": [1, 1, 1],
-        "pos2": [5, 5, 5],
-    },
-])
-
-
-tests["test_2d_mid"] = ZoneManager([
+test = ZoneManager([
     {
         "name": "Alice",
         "type": "Eggs",
@@ -56,41 +22,6 @@ tests["test_2d_mid"] = ZoneManager([
         "pos2": [5, 5],
     },
 ], axis_order=[1, 0])
-
-
-tests["test_2d_corner"] = ZoneManager([
-    {
-        "name": "Alice",
-        "type": "Eggs",
-        "pos1": [1, 2],
-        "pos2": [3, 4],
-    },
-    {
-        "name": "Bob",
-        "type": "Spam",
-        "pos1": [2, 3],
-        "pos2": [4, 5],
-    },
-], axis_order=[1, 0])
-
-
-tests["test_warn_eclipsed"] = ZoneManager([
-    {
-        "name": "Bob",
-        "type": "Spam",
-        "pos1": [1, 1],
-        "pos2": [5, 5],
-    },
-    {
-        "name": "Alice",
-        "type": "Eggs",
-        "pos1": [2, 2],
-        "pos2": [4, 4],
-    },
-], axis_order=[1, 0])
-
-
-test = tests["test_3d_mid"]
 
 zones_start = len(test)
 
@@ -109,6 +40,7 @@ print("="*120)
 
 print("Removing overlaps...")
 test.remove_overlaps()
+test.optimize()
 
 print("="*120)
 
@@ -136,12 +68,22 @@ print("-"*120)
 print("Max depth:  {}".format(tree.max_depth()))
 print("Leaf nodes: {}".format(len(tree)))
 
+i = 1
+merged = 1
+while merged > 0:
+    print("="*120)
+    print("Optimizing  {}...".format(i))
+
+    merged = tree.optimize()
+    tree.rebalance()
+
+    print("Merged:     {}".format(merged))
+    print("Max depth:  {}".format(tree.max_depth()))
+    print("Leaf nodes: {}".format(len(tree)))
+
+    i += 1
+
 print("="*120)
-print("Optimizing...")
-
-tree.optimize()
-
-print("-"*120)
-print("Max depth:  {}".format(tree.max_depth()))
-print("Leaf nodes: {}".format(len(tree)))
+print("Look out for that tree!")
+tree.show_tree()
 

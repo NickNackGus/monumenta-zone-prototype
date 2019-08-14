@@ -125,7 +125,7 @@ class Zone(object):
                 return False
         return True
 
-    def overlaping_zones(self, other):
+    def overlaping_zone(self, other):
         if not isinstance(other, Zone):
             raise TypeError("Expected other to be type Zone.")
 
@@ -136,10 +136,10 @@ class Zone(object):
             if axis > len(other_max):
                 continue
 
-            if other_max[axis] <= self_min[axis]:
+            if other_max[axis] < self_min[axis]:
                 return None
 
-            if self_max[axis] <= other_min[axis]:
+            if self_max[axis] < other_min[axis]:
                 return None
 
         result_min = self_min.max_corner(other_min)
@@ -159,7 +159,7 @@ class Zone(object):
         if not isinstance(overlap, Zone):
             raise TypeError("Expected overlap to be type Zone.")
 
-        work = Zone(self)
+        center_zone = Zone(self)
 
         other_min = overlap.min_corner
         other_max = overlap.max_corner + Pos([1]*len(other_min))
@@ -168,18 +168,32 @@ class Zone(object):
 
         for axis in self.axis_order:
             if axis > len(other_max):
+                # Skip axis if they don't apply
                 continue
 
-            lower, work = work.split_axis(other_min, axis)
+            work_zones = result
+            result = []
+
+            for work_zone in work_zones:
+                # Add zones split from existing split zones
+                lower, work_zone = work_zone.split_axis(other_min, axis)
+                work_zone, upper = work_zone.split_axis(other_max, axis)
+
+                if lower:
+                    result.append(lower)
+                if work_zone:
+                    result.append(work_zone)
+                if upper:
+                    result.append(upper)
+
+            # Add zones split from center, but not the center (overlap) itself
+            lower, center_zone = center_zone.split_axis(other_min, axis)
+            center_zone, upper = center_zone.split_axis(other_max, axis)
+
             if lower:
                 result.append(lower)
-
-            work, upper = work.split_axis(other_max, axis)
             if upper:
                 result.append(upper)
-
-        if not work:
-            print("{} is completely eclipsed by {}!".format(self, overlap))
 
         return result
 
@@ -197,6 +211,56 @@ class Zone(object):
         upper._pos[axis] += lower._size[axis]
 
         return (lower, upper)
+
+    def merge(self, other):
+        """Merge two zones without changing their combined size/shape.
+
+        Returns the merged zone or None.
+        """
+        a_min = self.min_corner
+        b_min = other.min_corner
+        a_size = self.size()
+        b_size = other.size()
+
+        # Confirm the zones can be merged without extending outside their bounds
+        different_axis = None
+        for axis in range(len(a_min)):
+            if (
+                a_min[axis] == b_min[axis]
+                and a_size[axis] == b_size[axis]
+            ):
+                # This axis matches, all good so far
+                continue
+
+            if different_axis is None:
+                # First different axis we've found
+                different_axis = axis
+            else:
+                # Second different axis; no merging this time
+                return None
+
+        if different_axis is None:
+            # Same zone
+            return Zone(self)
+        axis = different_axis
+
+        # Confirm the two zones are touching
+        if (
+            a_min[axis] + a_size[axis] != b_min[axis] and
+            b_min[axis] + b_size[axis] != a_min[axis]
+        ):
+            # They are not touching.
+            return None
+
+        # Merging is possible, go for it.
+        result = Zone(self)
+        min_corner = result.min_corner
+        max_corner = result.max_corner
+        min_corner[axis] = min(self.min_corner[axis], other.min_corner[axis])
+        max_corner[axis] = max(self.max_corner[axis], other.max_corner[axis])
+        result.min_corner = min_corner
+        result.max_corner = max_corner
+        return result
 
     def __repr__(self):
         if self: # None-zero size
