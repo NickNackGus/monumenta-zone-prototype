@@ -117,24 +117,6 @@ class ZoneManager(object):
         # Temporary to see how well this version works
         self._optimize_same_id_brute_force(zones)
 
-    def _optimize_same_id_tree(self, zones):
-        """Reduce the zones required to represent an area.
-
-        Uses the zone tree's optimize method on only zones of the same ID.
-        """
-        tree = ZoneTree(zones)
-
-        # Merge neighboring nodes as best as the tree can
-        merged = 1
-        while merged > 0:
-            merged = tree.optimize()
-            tree.rebalance()
-
-        # Update the list in place
-        zones.clear()
-        for zone in tree:
-            zones.append(zone)
-
     def _optimize_same_id_brute_force(self, zones):
         """Reduce the zones required to represent an area.
 

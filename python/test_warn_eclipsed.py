@@ -65,25 +65,16 @@ tree = test.get_tree()
 tree.show_tree()
 
 print("-"*120)
+print("Ave depth:  {:04.2f}".format(tree.average_depth()))
 print("Max depth:  {}".format(tree.max_depth()))
 print("Leaf nodes: {}".format(len(tree)))
-
-i = 1
-merged = 1
-while merged > 0:
-    print("="*120)
-    print("Optimizing  {}...".format(i))
-
-    merged = tree.optimize()
-    tree.rebalance()
-
-    print("Merged:     {}".format(merged))
-    print("Max depth:  {}".format(tree.max_depth()))
-    print("Leaf nodes: {}".format(len(tree)))
-
-    i += 1
 
 print("="*120)
 print("Look out for that tree!")
 tree.show_tree()
+
+test_point = Pos("3 3")
+print("Test point: {!r}".format(test_point))
+print("Test point's zone is:")
+print("{!r}".format(tree.get_zone(test_point)))
 

@@ -14,7 +14,7 @@ class ZoneTree(Zone):
         self._init(zones)
 
     def _init(self, zones):
-        """Load a list of zones. Reused by the rebalance method."""
+        """Load a list of zones. Formerly reused by the (depricated) rebalance method."""
         # True if this is an empty tree
         self.is_empty = False
         if len(zones) == 0:
@@ -30,90 +30,34 @@ class ZoneTree(Zone):
             self.here = zones[0]
             return
 
-        #######################################################################
-        # Everything past here applies only to parent nodes
+        # This is a parent node; this method handles all attributes required for it.
+        self._init_parent_node(zones)
 
-        # Which axis are we checking, and by what coordinate do we pivot?
-        self._axis, self._pivot = self.get_best_split(zones)
-
-        less = []
-        more = []
-        for zone in zones:
-            if self._pivot >= zone.max_corner[self._axis]:
-                more.append(zone)
-            else:
-                less.append(zone)
-
-        # Next node up/here/down on an axis
-        self._less = ZoneTree(less) # Includes overlapping areas
-        self._more = ZoneTree(more)
-
-    def rebalance(self):
-        """Rebalance the nodes of the tree."""
-        zones = list(self)
-        self.uninit()
-        self._init(zones)
-
-    def uninit(self):
-        """Uninitialize this node, deleting child nodes in the process."""
-        if self.is_empty:
-            self.is_empty = False
-
-        elif self.is_parent_node:
-            self._less.uninit()
-            self._more.uninit()
-
-            del self._less
-            del self._more
-
-            self.is_parent_node = False
-
-        else: # Leaf node
-            del self.here
-
-    def get_zone(self, pos):
-        """Get the zone a position is in."""
-        comparisons = 0
-        if self.is_empty:
-            comparisons += 1
-            return {"comparisons": 1, "zone": None}
-
-        elif self.is_parent_node:
-            comparisons += 1 + 1
-            if pos[self._axis] >= self._pivot:
-                comparisons += 1
-                result = self._more.get_zone(pos)
-                result["comparisons"] += comparisons
-                return result
-            else:
-                comparisons += 1
-                result = self._less.get_zone(pos)
-                result["comparisons"] += comparisons
-                return result
-
-        else: # Leaf node
-            comparisons += 1 + 1
-            if self.here.within(pos):
-                comparisons += 2*len(pos)
-                return {"comparisons": comparisons, "zone": self.here}
-            else:
-                comparisons += 2*len(pos)
-                return {"comparisons": comparisons, "zone": None}
-
-    def get_best_split(self, zones, debug=False):
+    def _init_parent_node(self, zones, debug=False):
         """Determine which way to split the undivided zones.
 
-        Best split results in more and less having an equal number of zones
-        on each side, or as close as possible.
+        Best split results having the lowest maximum of
+        the less, mid, and more groups.
         """
         if len(zones) < 2:
             raise IndexError("Cannot split fewer than two zones!")
 
         num_axes = len(zones[0].max_corner)
 
-        # max(len(less), len(more)), axis, pivot
+        # priority, axis, pivot, less, mid, more
         # Default is an impossibly worst case scenario so it will never be chosen.
-        worst_case = (len(zones), 0, zones[0].max_corner[0])
+        worst_case = { # Use a stuct or dumb class probably
+            "priority": len(zones) + 1,
+            "axis": 0,
+
+            "pivot": 0,
+            "pivot_min": 0,
+            "pivot_max": 0,
+
+            "less": [],
+            "mid": list(zones),
+            "more": [],
+        }
         best_split = worst_case
         if debug:
             print("="*120)
@@ -126,33 +70,105 @@ class ZoneTree(Zone):
 
         for pivot_zone in zones:
             for axis in range(num_axes):
-                pivot = pivot_zone.max_corner[axis]
+                for pivot in (pivot_zone.min_corner[axis], pivot_zone.true_max_corner[axis]):
+                    less = []
+                    pivot_min = pivot
+                    mid = []
+                    pivot_max = pivot
+                    more = []
 
-                less = 0
-                more = 0
+                    for zone in zones:
+                        if pivot >= zone.true_max_corner[axis]:
+                            less.append(zone)
+                        elif pivot >= zone.min_corner[axis]:
+                            pivot_min = min(pivot_min, zone.min_corner[axis])
+                            pivot_max = max(pivot_max, zone.true_max_corner[axis])
+                            mid.append(zone)
+                        else:
+                            more.append(zone)
 
-                for zone in zones:
-                    if pivot >= zone.max_corner[axis]:
-                        more += 1
-                    else:
-                        less += 1
+                    test_split = {
+                        "priority": max(len(less), len(mid), len(more)),
+                        "axis": axis,
 
-                test_split = (max(less, more), axis, pivot)
-                if debug:
-                    print("- {!r}".format(test_split))
+                        "pivot": pivot,
+                        "pivot_min": pivot_min,
+                        "pivot_max": pivot_max,
 
-                if test_split[0] >= best_split[0]:
-                    continue
+                        "less": less,
+                        "mid": mid,
+                        "more": more,
+                    }
+                    if debug:
+                        print("- {!r}".format(test_split))
 
-                best_split = test_split
-                if debug:
-                    print("  - New best!")
+                    if test_split["priority"] >= best_split["priority"]:
+                        continue
 
-        if worst_case[0] == best_split[0]:
+                    best_split = test_split
+                    if debug:
+                        print("  - New best!")
+
+        if worst_case["priority"] == best_split["priority"]:
+            # This shouldn't ever happen! Debug mode on if it wasn't on before!
             if not debug:
-                self.get_best_split(zones, debug=True)
+                self._init_parent_node(zones, debug=True)
+            else:
+                # This could be an assert instead, but I don't have that documentation marked offline and I have no data half my commute.
+                raise AssertionError("Could not find a solution.")
         else:
-            return best_split[1], best_split[2]
+            # Ok good, this is the answer we want. Copy values to self.
+            self._axis = best_split["axis"]
+
+            self._pivot = best_split["pivot"]
+            self._pivot_min = best_split["pivot_min"]
+            self._pivot_max = best_split["pivot_max"]
+
+            self._less = ZoneTree(best_split["less"])
+            self._mid = ZoneTree(best_split["mid"])
+            self._more = ZoneTree(best_split["more"])
+            return
+
+    def get_zone(self, pos):
+        """Get the zone a position is in."""
+        comparisons = 1
+        if self.is_empty:
+            return {"comparisons": 1, "zone": None}
+
+        elif self.is_parent_node:
+            comparisons += 1 + 1
+            result = None
+            if pos[self._axis] > self._pivot:
+                result = self._more.get_zone(pos)
+                result["comparisons"] += comparisons + 1
+                comparisons = result["comparisons"]
+                if result["zone"] is not None:
+                    return result
+            else:
+                result = self._less.get_zone(pos)
+                result["comparisons"] += comparisons + 1
+                comparisons = result["comparisons"]
+                if result["zone"] is not None:
+                    return result
+
+            # The result could be in the middle tree; search there if possible, and give up if it's not there.
+            comparisons += 2
+            if self._pivot_min <= pos[self._axis] and pos[self._axis] < self._pivot_max:
+                result = self._mid.get_zone(pos)
+                result["comparisons"] += comparisons
+                comparisons = result["comparisons"]
+                # If we find no zone, we're out of places to look - that's the result.
+                # Ancestor nodes may find something in their mid trees, though.
+                return result
+
+            return result
+
+        else: # Leaf node
+            comparisons += 1 + 2*len(pos)
+            if self.here.within(pos):
+                return {"comparisons": comparisons, "zone": self.here}
+            else:
+                return {"comparisons": comparisons, "zone": None}
 
     def __iter__(self):
         if self.is_empty:
@@ -160,6 +176,8 @@ class ZoneTree(Zone):
 
         elif self.is_parent_node:
             for zone in self._less:
+                yield zone
+            for zone in self._mid:
                 yield zone
             for zone in self._more:
                 yield zone
@@ -172,67 +190,47 @@ class ZoneTree(Zone):
             return 0
 
         elif self.is_parent_node:
-            return len(self._less) + len(self._more)
+            return len(self._less) + len(self._mid) + len(self._more)
 
         else: # Leaf node
             return 1
 
     def max_depth(self):
+        """Debug info only."""
         if self.is_empty:
             return 0
 
         elif self.is_parent_node:
             return 1 + max(
                 self._less.max_depth(),
+                self._mid.max_depth(),
                 self._more.max_depth()
             )
 
         else: # Leaf node
             return 1
 
-    def optimize(self):
-        """Merge nodes where possible.
+    def all_leaf_depths(self):
+        """Debug info only."""
+        if self.is_empty:
+            return []
 
-        This will be replaced by the optimize method in zone_manager if it's better.
-        Returns the number of merges that occured.
-        """
-        merged = 0
-        if self.is_empty or not self.is_parent_node:
-            return merged
+        elif self.is_parent_node:
+            return [leaf_depth + 1 for leaf_depth in self._less.all_leaf_depths() + self._mid.all_leaf_depths() + self._more.all_leaf_depths()]
 
-        if self._less.is_parent_node:
-            merged += self._less.optimize()
-        if self._more.is_parent_node:
-            merged += self._more.optimize()
+        else: # Leaf node
+            return [1]
 
-        if self._less.is_parent_node or self._more.is_parent_node:
-            return merged
+    def total_leaf_depth(self):
+        """Debug info only."""
+        result = 0
+        for leaf_depth in self.all_leaf_depths():
+            result += leaf_depth
+        return result
 
-        # Both child nodes are leaf nodes.
-        less = self._less.here
-        more = self._more.here
-
-        if less.original_id != more.original_id:
-            return merged
-
-        merged_zone = less.merge(more)
-        if merged_zone is None:
-            return merged
-        self.here = merged_zone
-
-        # Mark self as a leaf node, not a parent node
-        self.is_parent_node = False
-
-        # Delete unneeded attributes
-        del self._axis
-        del self._pivot
-        del self._less
-        del self._more
-
-        # This is merged, increment count
-        merged += 1
-
-        return merged
+    def average_depth(self):
+        """Debug info only."""
+        return self.total_leaf_depth() / len(self)
 
     def show_tree(self, header="─", prefix=""):
         """Print the tree structure to stdout for debugging."""
@@ -243,7 +241,7 @@ class ZoneTree(Zone):
             print(prefix + "╴" + "<Tree is empty>")
 
         elif self.is_parent_node:
-            print(prefix + "┬╴axis={!r}, pivot={!r}".format(self._axis, self._pivot))
+            print(prefix + "┬╴axis={!r}, pivot={!r}, mid_min={!r}, mid_max={!r}".format(self._axis, self._pivot, self._pivot_min, self._pivot_max))
 
             if header:
                 prefix = " " * len(header)
@@ -253,6 +251,7 @@ class ZoneTree(Zone):
             prefix = prefix.replace("└", " ")
 
             self._less.show_tree(None, prefix + "├─")
+            self._mid.show_tree(None,  prefix + "├─")
             self._more.show_tree(None, prefix + "└─")
 
         else: # Leaf node

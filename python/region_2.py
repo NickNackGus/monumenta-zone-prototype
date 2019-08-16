@@ -24,21 +24,6 @@ print("-"*120)
 print("Max depth:  {}".format(tree.max_depth()))
 print("Leaf nodes: {}".format(len(tree)))
 
-i = 1
-merged = 1
-while merged > 0:
-    print("="*120)
-    print("Optimizing  {}...".format(i))
-
-    merged = tree.optimize()
-    tree.rebalance()
-
-    print("Merged:     {}".format(merged))
-    print("Max depth:  {}".format(tree.max_depth()))
-    print("Leaf nodes: {}".format(len(tree)))
-
-    i += 1
-
 print("="*120)
 print("Look out for that tree!")
 tree.show_tree()

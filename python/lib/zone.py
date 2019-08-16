@@ -87,6 +87,10 @@ class Zone(object):
     def max_corner(self):
         return self.pos2
 
+    @property
+    def true_max_corner(self):
+        return self.pos1 + self.size()
+
     @min_corner.setter
     def min_corner(self, other):
         new_pos1 = Pos(other)
@@ -97,6 +101,12 @@ class Zone(object):
     def max_corner(self, other):
         new_max = Pos(other)
         old_max = self.pos2
+        self._size += new_max - old_max
+
+    @true_max_corner.setter
+    def true_max_corner(self, other):
+        new_max = Pos(other)
+        old_max = self.true_max_corner
         self._size += new_max - old_max
 
     def size(self):
@@ -116,12 +126,12 @@ class Zone(object):
             return False
 
         l = self.min_corner
-        m = self.max_corner
+        m = self.true_max_corner
 
         for i in range(len(pos)):
-            if l[i] > pos[i]:
+            if pos[i] < l[i]:
                 return False
-            if pos[i] >= m[i]:
+            if m[i] <= pos[i]:
                 return False
         return True
 
