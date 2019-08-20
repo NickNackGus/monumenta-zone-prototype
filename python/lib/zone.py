@@ -272,6 +272,9 @@ class Zone(object):
         result.max_corner = max_corner
         return result
 
+########################################################################################################################
+# Only needed for debug and statistics:
+
     def __repr__(self):
         if self: # None-zero size
             if self.equipment_damage is None:

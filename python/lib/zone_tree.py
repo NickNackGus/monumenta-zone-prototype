@@ -11,10 +11,6 @@ class ZoneTree(Zone):
     """A tree of zones for fast search."""
     def __init__(self, zones=[]):
         """Create a zone tree. Zones must not overlap to load."""
-        self._init(zones)
-
-    def _init(self, zones):
-        """Load a list of zones. Formerly reused by the (depricated) rebalance method."""
         # True if this is an empty tree
         self.is_empty = False
         if len(zones) == 0:
@@ -169,6 +165,9 @@ class ZoneTree(Zone):
                 return {"comparisons": comparisons, "zone": self.here}
             else:
                 return {"comparisons": comparisons, "zone": None}
+
+########################################################################################################################
+# Only needed for debug and statistics:
 
     def __iter__(self):
         if self.is_empty:

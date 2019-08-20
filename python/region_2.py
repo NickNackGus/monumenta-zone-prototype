@@ -21,6 +21,7 @@ test.optimize()
 tree = test.get_tree()
 
 print("-"*120)
+print("Ave depth:  {:04.2f}".format(tree.average_depth()))
 print("Max depth:  {}".format(tree.max_depth()))
 print("Leaf nodes: {}".format(len(tree)))
 

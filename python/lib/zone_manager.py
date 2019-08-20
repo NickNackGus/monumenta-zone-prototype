@@ -26,18 +26,6 @@ class ZoneManager(object):
     def __getitem__(self, key):
         return self.zones[key]
 
-    def names(self):
-        result = set()
-        for zone in self.zones:
-            result.add(zone.name)
-        return result
-
-    def types(self):
-        result = set()
-        for zone in self.zones:
-            result.add(zone.type)
-        return result
-
     def min_corner(self):
         result = self.zones[0].min_corner()
         for zone in self.zones[1:]:
@@ -114,7 +102,9 @@ class ZoneManager(object):
 
         zones provided must share the same ID.
         """
-        # Temporary to see how well this version works
+        # Temporarily redirects to another method to test how well it works.
+
+        # This method works, but a more efficient version can probably be made.
         self._optimize_same_id_brute_force(zones)
 
     def _optimize_same_id_brute_force(self, zones):
@@ -199,6 +189,9 @@ class ZoneManager(object):
 
         # None found with this recursion
         return None
+
+########################################################################################################################
+# Only needed for debug and statistics:
 
     def get_tree(self):
         return ZoneTree(self.zones)
