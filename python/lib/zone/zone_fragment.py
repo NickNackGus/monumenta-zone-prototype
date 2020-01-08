@@ -25,6 +25,20 @@ class ZoneFragment(ZoneBase):
         else:
             raise TypeError("Expected ZoneFragment to be initialized with a Zone or another ZoneFragment")
 
+    def split_axis(self, pos, axis):
+        """Returns (lower_zone, upper_zone) for this split along some axis.
+
+        Either zone may have a size of 0.
+        """
+        lower = ZoneFragment(self)
+        lower._size[axis] = pos[axis] - lower._pos[axis]
+
+        upper = ZoneFragment(self)
+        upper._size[axis] -= lower._size[axis]
+        upper._pos[axis] += lower._size[axis]
+
+        return (lower, upper)
+
     def split_by_overlap(self, overlap):
         """Returns a list of fragments of this zone, split by an overlapping zone."""
         # overlap is a ZoneBase that overlaps and doesn't extend beyond this ZoneFragment.
@@ -68,20 +82,6 @@ class ZoneFragment(ZoneBase):
                 result.append(upper)
 
         return result
-
-    def split_axis(self, pos, axis):
-        """Returns (lower_zone, upper_zone) for this split along some axis.
-
-        Either zone may have a size of 0.
-        """
-        lower = ZoneFragment(self)
-        lower._size[axis] = pos[axis] - lower._pos[axis]
-
-        upper = ZoneFragment(self)
-        upper._size[axis] -= lower._size[axis]
-        upper._pos[axis] += lower._size[axis]
-
-        return (lower, upper)
 
     def merge(self, other):
         """Merge two ZoneFragments without changing their combined size/shape.
